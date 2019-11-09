@@ -56,6 +56,13 @@ public class Chromosome {
 
         }
 
+        city1 = genes.get(0);
+        city2 = genes.get(genes.size()-1);
+        resultX = Math.abs(city1.getxCoordinate()-city2.getxCoordinate());
+        resultY = Math.abs(city1.getyCoordinate()-city2.getyCoordinate());
+        distanceBetween2Cities = Math.sqrt(resultX*resultX+resultY*resultY);
+        distance+=distanceBetween2Cities;
+
         return distance;
     }
 

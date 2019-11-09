@@ -5,27 +5,14 @@ public class GeneticAlgorithm {
 
     private List<Chromosome> population;
     private List<Chromosome> offspring;
-    Map<Chromosome,Double> fitnessPopulation = new HashMap<>();
-    Map<Chromosome,Double> fitnessOffspring = new HashMap<>();
-    private Chromosome bestOffSpring;
-    private Chromosome bestParent;
+    private List<Chromosome> totalPopulation;
+    Map<Chromosome,Double> fitnessTotalPopulation = new HashMap<>();
 
     public Chromosome getBest() {
         return best;
     }
 
     private Chromosome best;
-
-    private double bestOffspringFitness = Double.MAX_VALUE;
-    private double bestParentFitness = Double.MAX_VALUE;
-
-    public Chromosome getBestOffSpring() {
-        return bestOffSpring;
-    }
-
-    public Chromosome getBestParent() {
-        return bestParent;
-    }
 
     public List<Chromosome> generateInitialPopulation(List<City> cities) {
         population = new ArrayList<>(Constants.NUMBER_OF_CHROMOSOMES);
@@ -129,45 +116,39 @@ public class GeneticAlgorithm {
     }
 
     public void selection() {
-        if (!fitnessOffspring.isEmpty()) {
-            int j=0;
 
-            for (int i=Constants.NUMBER_OF_CHROMOSOMES/2; i < Constants.NUMBER_OF_CHROMOSOMES; i++) {
-                population.set(i, offspring.get(j));
-                j++;
+
+            totalPopulation = new ArrayList<>(population);
+            totalPopulation.addAll(offspring);
+            evaluateTotalPopulation();
+            sortTotalPopulation();
+
+            for (int i=0; i < Constants.NUMBER_OF_CHROMOSOMES/2; i++) {
+                population.set(i, totalPopulation.get(i));
+
             }
-        }
+
     }
 
-    public void sortPopulation(){
-        fitnessPopulation =  sortPopulation(fitnessPopulation);
-        population = fitnessPopulation.keySet().stream().collect(Collectors.toList());
+    private void sortTotalPopulation(){
+        fitnessTotalPopulation =  sortPopulation(fitnessTotalPopulation);
+
+        totalPopulation = fitnessTotalPopulation.keySet().stream().collect(Collectors.toList());
     }
 
-    public void sortOffspring() {
-        fitnessOffspring =  sortPopulation(fitnessOffspring);
-        offspring = fitnessOffspring.keySet().stream().collect(Collectors.toList());
-    }
-
-    public LinkedHashMap<Chromosome, Double> sortPopulation(Map<Chromosome,Double> fitnessMapPopulation) {
+    private LinkedHashMap<Chromosome, Double> sortPopulation(Map<Chromosome,Double> fitnessMapPopulation) {
         return fitnessMapPopulation.entrySet()
                 .stream()
                 .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
-    public void evaluateOffSpring() {
-        fitnessOffspring = new HashMap<>();
-        for (Chromosome chromosome: offspring) {
-            fitnessOffspring.put(chromosome,chromosome.calculateFitness());
-        }
-    }
 
-    public void evaluatePopulation() {
-        fitnessPopulation = new HashMap<>();
+    private void evaluateTotalPopulation() {
+        fitnessTotalPopulation = new HashMap<>();
 
-        for(Chromosome chromosome: population) {
-            fitnessPopulation.put(chromosome,chromosome.calculateFitness());
+        for(Chromosome chromosome: totalPopulation) {
+            fitnessTotalPopulation.put(chromosome,chromosome.calculateFitness());
         }
     }
 
@@ -183,7 +164,7 @@ a random integer.
             if(Math.random()>0.7) {
                 List<City> genes = offspring.get(i).getGenes();
 
-                for(int counter = 0;counter<3;counter++) {
+                for(int counter = 0;counter<2;counter++) {
                     int position1 = random.nextInt(genes.size());
                     int position2 = random.nextInt(genes.size());
                     City geneAtPosition1 = genes.get(position1);
@@ -196,25 +177,9 @@ a random integer.
     }
 
     public double getBestFitnessValue() {
-        for (Map.Entry<Chromosome, Double> entry : fitnessPopulation.entrySet()) {
-            if (entry.getValue()<bestParentFitness) {
-                bestParentFitness = entry.getValue();
-                bestParent = entry.getKey();
-            }
-        }
-
-        for (Map.Entry<Chromosome, Double> entry : fitnessOffspring.entrySet()) {
-            if (entry.getValue()<bestOffspringFitness) {
-                bestOffspringFitness = entry.getValue();
-                bestOffSpring = entry.getKey();
-            }
-        }
-
-        if (bestOffspringFitness<bestParentFitness) {
-            best = bestOffSpring;
-            return bestOffspringFitness;
-        }
-        best = bestParent;
-        return bestParentFitness;
+        best = fitnessTotalPopulation.entrySet().iterator().next().getKey();
+                return fitnessTotalPopulation.get(best);
     }
+
+
 }

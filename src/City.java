@@ -30,27 +30,4 @@ public class City {
         this.yCoordinate = yCoordinate;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        City city = (City) o;
-        return Double.compare(city.xCoordinate, xCoordinate) == 0 &&
-                Double.compare(city.yCoordinate, yCoordinate) == 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(xCoordinate, yCoordinate);
-    }
-
-    @Override
-    public String toString() {
-        return "City{" +
-                "xCoordinate=" + xCoordinate +
-                ", yCoordinate=" + yCoordinate +
-                '}';
-    }
-
-
 }
